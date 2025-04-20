@@ -28,6 +28,13 @@
     let zoneCount = 0;
     let zoneNames = [];
 
+    // Simulated mock data for crowd estimates
+    const mockData = {
+      "Zone 1": { crowdEstimate: 40 },  // Low density
+      "Zone 2": { crowdEstimate: 80 },  // Moderate density
+      "Zone 3": { crowdEstimate: 120 }  // High density
+    };
+
     function createZoneInputs() {
       const count = parseInt(document.getElementById('zoneCount').value);
       const inputContainer = document.getElementById('zoneNameInputs');
@@ -70,34 +77,32 @@
         container.appendChild(cardDiv);
       });
 
+      // Fetch the mock data
       updateData();
       setInterval(updateData, 2000);
     }
 
     function updateData() {
-      const data = {};
+      let total = 0;
       zoneNames.forEach(zone => {
-        data[zone] = Math.floor(Math.random() * 100);
+        const div = document.getElementById(`Zone ${zone}`);
+        const crowdEstimate = mockData[zone] ? mockData[zone].crowdEstimate : 0;
+        
+        // Update the status text with the crowd estimate
+        div.querySelector('.zone-status').innerText = `${zone}: ${crowdEstimate} people`;
+        total += crowdEstimate;
+
+        // Change background color based on crowd density
+        if (crowdEstimate < 40) {
+          div.style.backgroundColor = "green"; // Low density
+        } else if (crowdEstimate < 80) {
+          div.style.backgroundColor = "orange"; // Moderate density
+        } else {
+          div.style.backgroundColor = "red"; // High density
+        }
       });
 
-      let total = 0;
-      for (let i = 0; i < zoneCount; i++) {
-        const zone = zoneNames[i];
-        const div = document.getElementById(`Zone ${zone}`);
-        const count = data[zone];
-
-        div.querySelector('.zone-status').innerText = `${zone}: ${count} people`;
-        total += count;
-
-        if (count < 40) {
-          div.style.backgroundColor = "green";
-        } else if (count < 80) {
-          div.style.backgroundColor = "orange";
-        } else {
-          div.style.backgroundColor = "red";
-        }
-      }
-
+      // Update the overall density indicator
       const densityDiv = document.getElementById('densityIndicator');
       if (total < 100) {
         densityDiv.innerText = "Low Density";
@@ -113,3 +118,4 @@
   </script>
 </body>
 </html>
+
